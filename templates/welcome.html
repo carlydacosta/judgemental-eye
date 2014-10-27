@@ -1,0 +1,67 @@
+<html>
+<head>
+    <title>Welcome</title>
+     <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+</head>
+<body>
+
+    <h2>Welcome to our ratings app! Please log in.</h2>
+
+    <form class="form" id="log-in-form" action="/log-in" method='POST'>
+        <label>Email</label>
+        <input type="text" class="input-text" name="user-email">
+        <label>Password</label>
+        <input type="text" class="input-text" name="user-pw">
+        <button id="log-in-button" type="submit">Log In</button>
+    </form>
+
+    <h2>New user? Sign up here.</h2>
+
+    <form class="form" id="sign-up-form" action="/new-user" method='POST'>
+        <label>Email</label>
+        <input type="text" class="input-text" name="new-user-email">
+        <label>Password</label>
+        <input type="text" class="input-text" name="new-user-pw">
+        <label>Age</label>
+        <input type="text" class="input-text" name="new-user-age">
+        <label>Zipcode</label>
+        <input type="text" class="input-text" name="new-user-zipcode">
+        <button id="sign-up-button" type="submit">Sign Up</button>
+
+    </form>
+
+<script>
+
+    $('#log-in-button').click(function(evt) {
+        evt.preventDefault();
+        console.log($("#log-in-form").serialize());
+        $.post(
+            "/log-in",
+            $("#log-in-form").serialize(),
+            function(result) {
+                if ("error" in result) {
+                    console.log(result);
+                    alert("Please try your password again.");
+                    return;
+                } else {
+                    window.location = result.result;
+                }
+            },
+            "json")
+    });
+
+    // $('#sign-up-button').click(function(evt) {
+    //     evt.preventDefault();
+    //     var url = "/new-user?" + $('#sign-up-form').serialize();
+    //     console.log(url);
+    //     $.post(
+    //         "/new-user",
+    //         function(result) {
+    //             window.location(result);
+    //         })
+    // });
+
+</script>
+
+</body>
+</html>
