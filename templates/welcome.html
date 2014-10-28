@@ -6,7 +6,7 @@
 <body>
 
     <h2>Welcome to our ratings app! Please log in.</h2>
-
+    <h3 class="warning"></h3>
     <form class="form" id="log-in-form" action="/log-in" method='POST'>
         <label>Email</label>
         <input type="text" class="input-text" name="user-email">
@@ -41,7 +41,8 @@
             function(result) {
                 if ("error" in result) {
                     console.log(result);
-                    alert("Please try your password again.");
+                    // alert("Please try your password again.");
+                    $('.warning').html("Please try your password again");
                     return;
                 } else {
                     window.location = result.result;
@@ -50,16 +51,15 @@
             "json")
     });
 
-    // $('#sign-up-button').click(function(evt) {
-    //     evt.preventDefault();
-    //     var url = "/new-user?" + $('#sign-up-form').serialize();
-    //     console.log(url);
-    //     $.post(
-    //         "/new-user",
-    //         function(result) {
-    //             window.location(result);
-    //         })
-    // });
+    $('#sign-up-button').click(function(evt) {
+        evt.preventDefault();
+        $.post(
+            "/new-user",
+            $('#sign-up-form').serialize(),
+            function(result) {
+                window.location = result;
+            })
+    });
 
 </script>
 
