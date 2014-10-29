@@ -1,31 +1,21 @@
 <html>
 <head>
     <title>Ratings App</title>
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    
 </head>
 <body>
     <h1>Ratings App</h1>
 
+    <button id="get-dashboard">Bring me to my dashboard!</button>
+    <button id="get-users">Show me other users!</button>
 
     <div class="result">
-        <h3>Your ratings</h3>
+        <h3 id="list-heading"></h3>
         <div class="result-list"></div>
     </div>
-
-
-
-    <script>
-    $(document).ready(function(e) {
-        $.get(
-            "/get-user-ratings",
-            function(result) {
-                console.log(result)
-            })
-    })
-
-
-
-    </script>
+    
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="../static/index.js"></script>
 
 </body>
 </html>
