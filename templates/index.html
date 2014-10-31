@@ -1,13 +1,22 @@
 <html>
 <head>
     <title>Ratings App</title>
-    
+    <link href='http://fonts.googleapis.com/css?family=Walter+Turncoat' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="../static/index.css"></link>
 </head>
 <body>
-    <h1>Ratings App</h1>
 
-    <button id="get-dashboard">Bring me to my dashboard!</button>
-    <button id="get-users">Show me other users!</button>
+    <div class="header">
+
+        <div id="logo">
+            <h1>Judgemental<img src="../static/eye.png">&nbsp;Eye</h1>
+        </div>
+
+        <button class="nav" id="get-dashboard">Show me my dashboard!</button>
+        <button class="nav" id="get-users">Show me other users!</button>
+        <button class="nav" id="log-out">Log out!</button>
+
+    </div>
 
     <div class="result">
         <h3 id="list-heading"></h3>

@@ -1,0 +1,32 @@
+body {
+    background-color: #563A66;
+    color: white;
+    font-family: "Helvetica Neue", sans-serif;
+    font-weight: 200;
+    padding: 2em;
+}
+
+h1 {
+    font-family: Rock Salt, serif;
+    margin: 20px;
+    text-align: center;
+}
+
+form > div {
+    height: 2em;
+}
+
+.forms {
+    width: 40%;
+    margin: 0 auto;
+}
+
+.form-container {
+    margin-top: 30px;
+}
+
+input[type=text],
+select {
+    position: absolute;
+    left: 28em;
+}

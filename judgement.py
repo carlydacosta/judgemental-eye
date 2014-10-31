@@ -3,6 +3,7 @@ from flask import session as b_session
 import model
 import json
 import ast
+import correlation
 
 app = Flask(__name__)
 
@@ -60,7 +61,7 @@ def get_user_ratings(id = None):
     ratings_list = {}
 
     for rating in rating_object:
-        ratings_list[rating.movie.name] = rating.rating
+        ratings_list[rating.movie.name] = [rating.rating, rating.movie_id]
 
     return jsonify(**ratings_list) ## JSONIFY!!!
 
@@ -79,27 +80,108 @@ def get_user_list():
 
 @app.route("/update_ratings", methods=['POST'])
 def update_ratings():
-    # key = movie id   value = updated rating
-    updates_dict = request.form.get("updates")
-    updates_dict = ast.literal_eval("{'code1':1,'code2':1}")
-    # get user object for the viewer (i.e. 5)
-    print "this is what was returned: ", updates_dict
-    # print dir(updates_dict)
-    print "this is its type:", type(updates_dict)
+
+    updates_dict = ast.literal_eval(request.form.get("updates")) #DICTIFY!!!!
+
     for movie_id, updated_rating in updates_dict.iteritems():
-        # key = movie
-        query = model.session.query(model.Rating).filter_by(user_id="5", movie_id=movie_id).all()
-        print query
+        query = model.session.query(model.Rating).filter_by(user_id=b_session["user"], movie_id=movie_id).one()
+        print "old rating", query.rating
+        query.rating = updated_rating
+        print "new rating", query.rating
+    model.session.commit()
+    
+    return  json.dumps({ "success": "all movie ratings were updated" })
 
-    # rating_obj_list = model.session.query(model.Rating).filter_by(user_id=5).all()
-    # print rating_obj_list, "*****"
-    # # iterate through the dictionary keys, update the user attributes
-    # for rating in rating_obj_list:
-    #     print rating.movie_id, "-------"
-    # model.session.commit()
+@app.route("/log-out", methods=['POST'])
+def log_out():
 
-    # print updates_dict
-    return  json.dumps({ "success": "try again"})
+    b_session["user"] = {}
+    return "/"
+
+@app.route("/movie", methods=["GET"])
+def view_movie():
+
+    id = request.args.get("id")
+    print "this is for id: ", id
+
+    movie = model.session.query(model.Movie).get(id)
+
+    print "movie obj: ", movie
+
+    ratings = movie.ratings
+    rating_nums = []
+    
+    # print "ratings: ", ratings
+
+    user_rating = None
+    for r in ratings:
+        if r.user_id == b_session['user']:
+            user_rating = r
+        rating_nums.append(r.rating)
+    avg_rating = float(sum(rating_nums))/len(rating_nums)
+    print "avg rating is: ", avg_rating
+    print "user rating obj is: ", user_rating
+    # print "user rating is: ", user_rating.rating
+
+    user = model.session.query(model.User).get(b_session['user'])
+
+    print "we have a user", user
+
+    prediction = None
+    if not user_rating:
+        prediction = user.predict_rating(movie)
+        effective_rating = prediction
+    else:
+        effective_rating = user_rating.rating
+
+    print "prediction is: ", prediction
+    print "effective rating is: ", effective_rating
+
+    the_eye = model.session.query(model.User).filter_by(email="theeye@ofjudgement.com").one()
+    eye_rating = model.session.query(model.Rating).filter_by(user_id=the_eye.id, movie_id=movie.id).first()
+    print "the_eye object:", the_eye
+    print "eye rating object is: ", eye_rating
+    print "the eye's prediction of movie rating", the_eye.predict_rating(movie)
+
+    if not eye_rating:
+        print "THERE IS NO EYE RATING"
+        eye_rating = the_eye.predict_rating(movie) # returns None because no similarities
+    else:
+        eye_rating = eye_rating.rating
+
+    print " eye rating: ", eye_rating
+    print "effective rating: ", effective_rating
+
+    difference = abs(eye_rating - effective_rating)
+    print "difference", difference
+
+    messages = [ "I suppose you don't have such bad taste after all.",
+             "I regret every decision that I've ever made that has brought me to listen to your opinion.",
+             "Words fail me, as your taste in movies has clearly failed you.",
+             "That movie is great. For a clown to watch. Idiot.", ]
+
+    beratement = messages[int(difference)]
+    print "beratement: ", beratement
+
+    # End prediction
+    # create a list, jsonify it, and return it to the get requester
+    results = {
+        'movie id': movie.id,
+        'avg rating': avg_rating,
+        'user rating': None,
+        'prediction': prediction,
+        'beratement': beratement,
+        'movie title': movie.name
+        }
+    if user_rating:
+        results['user rating'] = user_rating.rating
+
+    print "RESULTS", results
+    return jsonify(**results)
+
+    # return render_template("movie.html", movie=movie, 
+    #         average=avg_rating, user_rating=user_rating,
+    #         prediction=prediction)
 
 if __name__ == "__main__":
     app.run(debug=True)
