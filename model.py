@@ -46,7 +46,7 @@ class User(Base):
         similarities = [ sim for sim in similarities if sim[0] > 0 ]
         print "similarities:", similarities
         if not similarities:
-            return None
+            return 0
         numerator = sum([ r.rating * similarity for similarity, r in similarities ])
         denominator = sum([ similarity[0] for similarity in similarities ])
         return numerator/denominator
